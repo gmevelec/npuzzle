@@ -29,14 +29,24 @@ int		main(int ac, char **av)
 
 		Node goal(g.puzzle, g.size);
 		std::cout << start.size << std::endl;
-		a_star_search(start, goal, came_from, cost_so_far);
+		info_values info;
 
-		std::cout << "PATH = " << std::endl;
+		a_star_search(start, goal, came_from, cost_so_far, info);
+
 		std::vector<Node> path = reconstruct_path(start, goal, came_from);
-		for (size_t i = 0; i < path.size(); ++i)
-		{
-			std::cout << path[i] << std::endl;
-		}
+
+		info.nbOfMoves = path.size() - 1;
+
+		std::cout << "----------------------------" << std::endl;
+		std::cout << "Total number of states ever selected in the opened set: " << info.nbStatesSelected << std::endl;
+		std::cout << "Maximum number of states ever represented in memory at the same time: " << info.maxNbofStates << std::endl;
+		std::cout << "Number of moves required: " << info.nbOfMoves << std::endl;
+		std::cout << "----------------------------" << std::endl;
+		// std::cout << "PATH = " << std::endl;
+		// for (size_t i = 0; i < path.size(); ++i)
+		// {
+		// 	std::cout << path[i] << std::endl;
+		// }
 	}
 	catch (std::exception const& e)
 	{

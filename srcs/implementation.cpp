@@ -1,69 +1,3 @@
-
-// struct SquareGrid {
-//   typedef tuple<int,int> Location;
-//   static array<Location, 4> DIRS;
-
-//   int width, height;
-//   unordered_set<Location> walls;
-
-//   SquareGrid(int width_, int height_)
-//      : width(width_), height(height_) {}
-
-//   inline bool in_bounds(Location id) const {
-//     int x, y;
-//     tie (x, y) = id;
-//     return 0 <= x && x < width && 0 <= y && y < height;
-//   }
-
-//   inline bool passable(Location id) const {
-//     return !walls.count(id);
-//   }
-
-//   vector<Location> neighbors(Location id) const {
-//     int x, y, dx, dy;
-//     tie (x, y) = id;
-//     vector<Location> results;
-
-//     for (auto dir : DIRS) {
-//       tie (dx, dy) = dir;
-//       Location next(x + dx, y + dy);
-//       if (in_bounds(next) && passable(next)) {
-//         results.push_back(next);
-//       }
-//     }
-
-//     if ((x + y) % 2 == 0) {
-//       // aesthetic improvement on square grids
-//       std::reverse(results.begin(), results.end());
-//     }
-
-//     return results;
-//   }
-// };
-
-// struct GridWithWeights: SquareGrid {
-//   unordered_set<Location> forests;
-//   GridWithWeights(int w, int h): SquareGrid(w, h) {}
-//   double cost(Location from_node, Location to_node) const { 
-//     return forests.count(to_node) ? 5 : 1; 
-//   }
-// };
-
-// int main() {
-//   GridWithWeights grid = make_diagram4(); DONE
-//   SquareGrid::Location start{1, 4}; DONE
-//   SquareGrid::Location goal{8, 5}; DONE
-//   unordered_map<SquareGrid::Location, SquareGrid::Location> came_from;
-//   unordered_map<SquareGrid::Location, double> cost_so_far;
-//   a_star_search(grid, start, goal, came_from, cost_so_far);
-//   draw_grid(grid, 2, nullptr, &came_from);
-//   std::cout << std::endl;
-//   draw_grid(grid, 3, &cost_so_far, nullptr);
-//   std::cout << std::endl;
-//   vector<SquareGrid::Location> path = reconstruct_path(start, goal, came_from);
-//   draw_grid(grid, 3, nullptr, nullptr, &path);
-// }
-
 #include "implementation.h"
 #include <queue>
 #include <map>
@@ -291,7 +225,8 @@ void	a_star_search(
 	Node start,
 	Node goal,
 	std::unordered_map<Node, Node>& came_from,
-	std::unordered_map<Node, float>& cost_so_far)
+	std::unordered_map<Node, float>& cost_so_far,
+	info_values& info)
 {
 	PriorityQueue<Node, float> open;
 
@@ -306,6 +241,7 @@ void	a_star_search(
 	while (!open.empty())
 	{
 		auto current = open.get();
+		info.nbStatesSelected++;
 		if (current == goal)
 		{
 			std::cout << "FINISHED" << std::endl;
@@ -319,10 +255,12 @@ void	a_star_search(
 			if (!cost_so_far.count(next) || new_cost < cost_so_far[next])
 			{
 				cost_so_far[next] = new_cost;
+				info.maxNbofStates++;
 				next.h = linearConflict(next, goal);
 				next.g = new_cost;
 				next.f = next.g + next.h;
 				open.put(next, next.f);
+				info.maxNbofStates++;
 				came_from.emplace(Node(next), current);
 			}
 		}
